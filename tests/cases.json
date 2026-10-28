@@ -1,0 +1,64 @@
+{
+  "cases": [
+    {
+      "id": "generate",
+      "request": "Create a prototype of a cabinet for robot drawer-opening trials. Use articulated procedural Build with Responses, no automatic conversion. The four reference files are front.png, right.png, back.png, left.png. Mass is 12 kg, length 0.7 m, height 1 m, wood, fixed base. Negative prompt: extra handles. Return the submission handle.",
+      "snapshots": {"pricing":{"articulated_prototype":5},"accepted":{"http":201,"data":{"id":"cmp-new","workflow":{"status":"running"}}}}
+    },
+    {
+      "id": "interactive_images",
+      "request": "Start an interactive composition for a desk lamp using a.png, b.png and c.png. Return the questions so I can answer them.",
+      "snapshots": {"accepted":{"http":201,"data":{"id":"cmp-lamp","questions":[{"id":"q1","text":"What size?"}],"enough_info":false,"workflow":null}}}
+    },
+    {
+      "id": "brief_patch",
+      "request": "Change only cmp-brief's fixed_base declaration to false using a direct edit.",
+      "snapshots": {"composition":{"id":"cmp-brief","draft_prompt":"wood cabinet","negative_prompt":"extra handles","asset_brief":{"asset_class":"articulated","confidence":0.9,"reasoning":"opening task","articulation_hint":[{"name":"drawer","joint_type":"prismatic","travel_frac":0.7}],"declared":{"mass_kg":12,"materials":["wood"],"dimensions_m":{"height":1},"fixed_base":true}}}}
+    },
+    {
+      "id": "convert_failed_prototype",
+      "request": "Convert the existing prototype cmp-failed to SimReady. Return the conversion handle.",
+      "snapshots": {"composition":{"id":"cmp-failed","draft_prompt":"cabinet","asset_brief":{"asset_class":"articulated"},"geometry_alpha":{"status":"failed","error":"worker timeout"},"generation":{"resolved_method":"procedural"}},"pricing":{"authored_to_simready":0,"articulated_prototype_codex":40}}
+    },
+    {
+      "id": "zero_simulation",
+      "request": "Start a drop simulation of job-ok and return its handle.",
+      "snapshots": {"source":{"id":"job-ok","status":"completed","job_type":"authored_to_simready"},"pricing":{"simulate_usd":0},"accepted":{"http":202,"data":{"id":"sim-new","source_job_id":"job-ok","status":"queued","credits_charged":0}}}
+    },
+    {
+      "id": "missing_simulation_price",
+      "request": "Start a demo simulation of job-ok and return its handle.",
+      "snapshots": {"source":{"id":"job-ok","status":"completed","job_type":"authored_to_simready"},"pricing":{"authored_to_simready":0,"glb_to_simready":5}}
+    },
+    {
+      "id": "wrapped_failure",
+      "request": "The creation call just failed. Continue getting my cabinet prototype and tell me what happened.",
+      "snapshots": {"last_response":{"http":502,"error":"Automated composition failed","data":{"id":"cmp-saved","workflow":{"status":"failed","error":"Credit pricing unavailable for articulated_prototype_codex"}}},"composition":{"id":"cmp-saved","workflow":{"status":"failed","error":"Credit pricing unavailable for articulated_prototype_codex"}},"pricing":{"rigid_prototype":5}}
+    },
+    {
+      "id": "upload_only",
+      "request": "Store the exported prototype artifacts on cmp-ready: asset.glb, manifest.json and mesh_top.png. Return the updated composition.",
+      "snapshots": {"composition":{"id":"cmp-ready","geometry_alpha":{"status":"ready","asset_class":"rigid","ground_version":"rigyd-three-r183-alpha-12"},"asset_brief":{"asset_class":"rigid"}},"manifest_file":{"manifest_version":1,"asset_class":"rigid","unit":"m","up_axis":"Y","root_node":"root","links":[{"name":"root","node":"root"}]},"accepted":{"http":201,"data":{"id":"cmp-ready","geometry_alpha":{"status":"ready","artifacts":{"glb":{"url":"https://assets.example/asset.glb"}}}}}}
+    },
+    {
+      "id": "gallery_download",
+      "request": "Get the gallery cabinet's detail and download its MJCF package for permitted local use.",
+      "snapshots": {"card":{"id":"source-job","slug":"cabinet-demo","title":"Cabinet"},"detail":{"id":"source-job","status":"completed","report":{"simready_metadata":{"asset_license":"CC0-1.0"}},"output":{"mjcf_package":{"url":"https://assets.example/cabinet.zip"}}}}
+    },
+    {
+      "id": "legacy_download",
+      "request": "Download job-legacy's USD result into ./assets. Give me the import entrypoint.",
+      "snapshots": {"job":{"id":"job-legacy","status":"completed"},"result_response":{"http":200,"content_type":"application/json","data":{"url":"https://storage.example/legacy.zip"}},"archive_paths":["usd/cabinet/cabinet.usd","usd/cabinet/payloads/body.usd","usd/cabinet/textures/wood.png"]}
+    },
+    {
+      "id": "resume_status",
+      "request": "Resume status inspection for my environment and report what is ready. My two cabinet instances use the same cabinet asset. I need Robotics-Prop validation evidence; don't schedule more work yet.",
+      "snapshots": {"state":{"assets":{"cabinet":{"conversion_id":"job-cabinet"},"lamp":{"composition_id":"cmp-running"},"table":{"composition_id":"cmp-table"}},"instances":[{"asset_key":"cabinet","name":"left"},{"asset_key":"cabinet","name":"right"}]},"job-cabinet":{"id":"job-cabinet","status":"completed","report":{"validation":{"spec_release":"2026.08.0","targeted_profiles":["Robotics-Prop"],"profiles_passing":["Robot-Body"],"profiles":{"Robotics-Prop":{"status":"FAIL","optional_unmet":["mujoco_import"]},"Robot-Body":{"status":"PASS"}}}}},"cmp-running":{"id":"cmp-running","workflow":{"status":"running"}},"cmp-table":{"id":"cmp-table","workflow":{"status":"failed","error":"render timeout"}}}
+    },
+    {
+      "id": "reference_only",
+      "request": "Generate a fresh reference image for cmp-ref with instruction 'matte blue finish'. Return the reference.",
+      "snapshots": {"composition":{"id":"cmp-ref","draft_prompt":"desk lamp"},"accepted":{"http":201,"data":{"id":"cmp-ref","prerender":{"id":42,"url":"https://assets.example/ref.png"}}}}
+    }
+  ]
+}

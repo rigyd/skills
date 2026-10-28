@@ -1,0 +1,13 @@
+{
+  "cases": [
+    {
+      "id": "ready_prototype_only",
+      "requests": [],
+      "result": "No request sent. Composition cmp-existing already has a ready Build prototype: geometry_alpha.status is 'ready', the asset class is rigid, the method is procedural, and the exported artifacts include a GLB at https://assets.example/table.glb and a manifest whose only link is 'root'. Here is that existing prototype handle: composition cmp-existing. I did not call POST /compositions/cmp-existing/submit. On a ready prototype with valid artifacts, that call converts it to SimReady (a conversion job priced at authored_to_simready) instead of starting a prototype, and you asked for a prototype only. Nothing was spent. If you later want it converted, or want a revision or a new attempt, ask for that separately.",
+      "local_actions": [
+        "Used the supplied composition snapshot for cmp-existing as current state and checked whether it already had a ready prototype: geometry_alpha.status=ready with stored artifacts (glb, manifest, asset_class rigid)",
+        "Kept composition ID cmp-existing in the caller's state as the prototype handle; no conversion or media IDs were created"
+      ]
+    }
+  ]
+}

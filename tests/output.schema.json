@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type":"string"},
+          "requests": {
+            "type":"array",
+            "items": {
+              "type":"object",
+              "additionalProperties": false,
+              "properties": {
+                "method":{"type":"string"},
+                "url":{"type":"string"},
+                "authentication":{"type":"string","enum":["rigyd","none"]},
+                "encoding":{"type":"string","enum":["json","multipart","none"]},
+                "body_json":{"type":"string"}
+              },
+              "required":["method","url","authentication","encoding","body_json"]
+            }
+          },
+          "result":{"type":"string"},
+          "local_actions":{"type":"array","items":{"type":"string"}}
+        },
+        "required":["id","requests","result","local_actions"]
+      }
+    }
+  },
+  "required":["cases"]
+}

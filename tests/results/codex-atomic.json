@@ -1,0 +1,223 @@
+{
+  "cases": [
+    {
+      "id": "answer",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-question/answer",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"answers\":[{\"question_id\":\"q1\",\"values\":[\"medium\"],\"custom\":\"0.4 metres\"}]}"
+        }
+      ],
+      "result": "Draft returned: composition cmp-question, stage draft, draft_prompt \"desk lamp\". No brief or prototype was started.",
+      "local_actions": []
+    },
+    {
+      "id": "message",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-edit/message",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"message\":\"make the shade wider\"}"
+        }
+      ],
+      "result": "Revised draft returned: composition cmp-edit, draft_prompt \"wide-shade desk lamp\".",
+      "local_actions": []
+    },
+    {
+      "id": "brief",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-brief-only/brief",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Physics brief ready for review: composition cmp-brief-only, status ready, asset_brief {\"asset_class\":\"rigid\"}. No prototype or conversion was started.",
+      "local_actions": []
+    },
+    {
+      "id": "select",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-select/prerender/select",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"media_ids\":[3,2]}"
+        }
+      ],
+      "result": "References selected for cmp-select in order [3,2]; media 3 is primary. No prototype was regenerated.",
+      "local_actions": []
+    },
+    {
+      "id": "revise",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-revise/geometry-alpha",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"geometry_builder\":\"responses\",\"feedback\":\"increase hinge clearance\"}"
+        }
+      ],
+      "result": "Revision accepted (HTTP 202). Composition handle: cmp-revise; geometry_alpha.status: building. No conversion was started; no polling was requested. The response does not report a charge amount.",
+      "local_actions": [
+        "Use the already-read ready procedural geometry; preserve its responses builder and articulated class. This valid revision reuses the existing prototype reservation."
+      ]
+    },
+    {
+      "id": "geometry_status",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/compositions/cmp-progress/geometry-alpha",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Build status refreshed once: composition cmp-progress, geometry_alpha.status ready, ground_version rigyd-three-r183-alpha-12.",
+      "local_actions": []
+    },
+    {
+      "id": "scaffold",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/geometry-alpha/scaffold?ground_version=rigyd-three-r183-alpha-12",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Rendering ground returned: {\"version\":\"rigyd-three-r183-alpha-12\",\"html\":\"<!doctype html>...\"}. No rendering or artifact export was performed.",
+      "local_actions": []
+    },
+    {
+      "id": "convert_ready",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-stored/submit",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"asset_license\":\"CC0-1.0\"}"
+        }
+      ],
+      "result": "Conversion accepted (HTTP 202). Conversion job handle: job-converted; job_type authored_to_simready; status queued; credits_charged 0. Source composition: cmp-stored. No polling, download, or simulation was performed.",
+      "local_actions": [
+        "Verify conversion readiness from the supplied ready geometry, stored GLB, and nonempty manifest links; reuse those artifacts without exporting or uploading replacements.",
+        "Use the already-read current authored_to_simready price of 0 credits; zero is an available price."
+      ]
+    },
+    {
+      "id": "file_conversion",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/conversions",
+          "authentication": "rigyd",
+          "encoding": "multipart",
+          "body_json": "{\"file\":{\"file\":\"table.glb\"},\"description\":\"wood shell table\",\"declared\":\"{\\\"mass_kg\\\":3,\\\"dimensions_m\\\":{\\\"height_m\\\":0.8},\\\"materials\\\":[\\\"wood\\\"],\\\"construction\\\":\\\"shell\\\",\\\"object_category\\\":\\\"solid_wood\\\",\\\"wall_mm\\\":5}\",\"asset_license\":\"CC-BY-4.0\",\"optimize\":\"true\",\"target_triangle_count\":\"12000\",\"threshold\":\"0.06\",\"llm_provider\":\"azure\",\"skip_validation\":\"true\"}"
+        }
+      ],
+      "result": "Conversion accepted (HTTP 202). Conversion job handle: job-uploaded; job_type glb_to_simready; status preprocessing; credits_charged 5. Requested optimization and declared physics were submitted unchanged. skip_validation=true suppresses the internal correctness gate, not SimReady scoring. No polling, download, or simulation was performed.",
+      "local_actions": [
+        "Use the already-read current glb_to_simready price of 5 credits.",
+        "Read table.glb as binary, verify it is nonempty and within the 500 MB upload limit, and attach its unchanged bytes with filename table.glb.",
+        "Construct multipart fields in the listed order, JSON-encode declared, and let the HTTP client supply the multipart boundary."
+      ]
+    },
+    {
+      "id": "pricing",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/conversions/pricing",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Available prices, in credits: glb_to_simready 5; authored_to_simready 0; simulate_usd 0. Pricing source: configured. Both zero prices are available; omitted prototype pricing keys are unavailable.",
+      "local_actions": []
+    },
+    {
+      "id": "jobs_list",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/conversions?page=2&pageSize=10&job_type=glb_to_simready,authored_to_simready",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "No conversion jobs on page 2. Returned data: []; pagination: {\"page\":2,\"pageSize\":10,\"pageCount\":1,\"total\":4}.",
+      "local_actions": []
+    },
+    {
+      "id": "compositions_list",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/compositions?page=2&pageSize=10",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "No compositions returned for page 2 with pageSize 10. Returned data: []. This endpoint does not return pagination metadata.",
+      "local_actions": []
+    },
+    {
+      "id": "sharing",
+      "requests": [
+        {
+          "method": "PATCH",
+          "url": "https://api.rigyd.com/api/conversions/job-share/sharing",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"is_public\":true}"
+        }
+      ],
+      "result": "Conversion job-share is now publicly accessible: is_public true. Sharing does not grant a redistribution license.",
+      "local_actions": []
+    },
+    {
+      "id": "shared",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/shared-conversions/job-public",
+          "authentication": "none",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Public asset returned: {\"id\":\"job-public\",\"status\":\"completed\",\"filename\":\"cabinet.glb\",\"output\":{\"usd_package\":{\"url\":\"https://assets.example/cabinet.zip\"}}}. No package was downloaded.",
+      "local_actions": []
+    },
+    {
+      "id": "gallery_list",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/demo-assets?tag=furniture&show_on_landing=true",
+          "authentication": "none",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Gallery assets returned: [{\"id\":\"source-id\",\"slug\":\"cabinet\",\"title\":\"Cabinet\",\"tags\":[\"furniture\"],\"show_on_landing\":true}]. source-id is the source conversion ID; cabinet is the gallery slug.",
+      "local_actions": []
+    }
+  ]
+}

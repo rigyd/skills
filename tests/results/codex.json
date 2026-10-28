@@ -1,0 +1,190 @@
+{
+  "cases": [
+    {
+      "id": "generate",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/generate",
+          "authentication": "rigyd",
+          "encoding": "multipart",
+          "body_json": "{\"prompt\":\"cabinet\",\"robot_task\":\"robot drawer-opening trials\",\"asset_class\":\"articulated\",\"generation_method\":\"procedural\",\"geometry_builder\":\"responses\",\"auto_submit\":\"false\",\"negative_prompt\":\"extra handles\",\"physical_context\":\"{\\\"mass_kg\\\":12,\\\"dimensions_m\\\":{\\\"length\\\":0.7,\\\"height\\\":1},\\\"materials\\\":[\\\"wood\\\"],\\\"fixed_base\\\":true}\",\"images\":[{\"file\":\"front.png\"},{\"file\":\"right.png\"},{\"file\":\"back.png\"},{\"file\":\"left.png\"}]}"
+        }
+      ],
+      "result": "Composition handle: cmp-new; workflow: running. Articulated procedural Build via Responses, prototype only; no automatic conversion or waiting. Configured prototype price: 5 credits; actual charge was not returned.",
+      "local_actions": [
+        "Use the already-read articulated_prototype price of 5 credits; do not refetch pricing.",
+        "Validate the four PNG files are within the 10 MB per-file limit and upload in front/right/back/left order.",
+        "Retain composition_id=cmp-new in caller state before any dependent work; stop after acceptance."
+      ]
+    },
+    {
+      "id": "interactive_images",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/start",
+          "authentication": "rigyd",
+          "encoding": "multipart",
+          "body_json": "{\"input\":\"desk lamp\",\"images\":[{\"file\":\"a.png\"},{\"file\":\"b.png\"},{\"file\":\"c.png\"}]}"
+        }
+      ],
+      "result": "Composition handle: cmp-lamp; enough_info: false; workflow: null. Questions: [{\"id\":\"q1\",\"text\":\"What size?\"}]. Interactive start accepts three images; no prototype was started.",
+      "local_actions": [
+        "Validate the three PNG files against the interactive 0\u20134 image count and 10 MB per-file limit; preserve a.png, b.png, c.png order.",
+        "Retain composition_id=cmp-lamp and the returned question IDs; return the questions without answering, generating a brief, or submitting a prototype."
+      ]
+    },
+    {
+      "id": "brief_patch",
+      "requests": [
+        {
+          "method": "PATCH",
+          "url": "https://api.rigyd.com/api/compositions/cmp-brief",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"asset_brief\":{\"asset_class\":\"articulated\",\"confidence\":0.9,\"reasoning\":\"opening task\",\"articulation_hint\":[{\"name\":\"drawer\",\"joint_type\":\"prismatic\",\"travel_frac\":0.7}],\"declared\":{\"mass_kg\":12,\"materials\":[\"wood\"],\"dimensions_m\":{\"height\":1},\"fixed_base\":false}}}"
+        }
+      ],
+      "result": "Direct update requested for cmp-brief: asset_brief.declared.fixed_base=false. All other supported brief fields and the existing draft/negative prompt are preserved. No recorded PATCH response is supplied, so server persistence is unconfirmed.",
+      "local_actions": [
+        "Use the already-read composition; clone its complete supported asset_brief and change only declared.fixed_base to false.",
+        "Send the merged replacement brief, not a nested partial patch; leave top-level draft_prompt and negative_prompt untouched.",
+        "Read the PATCH response before reporting a confirmed update; do not start a prototype or conversion."
+      ]
+    },
+    {
+      "id": "convert_failed_prototype",
+      "requests": [],
+      "result": "No conversion submitted and no conversion handle exists. cmp-failed has failed Build geometry: worker timeout. Conversion requires a ready prototype with valid stored artifacts or a completed Tripo model. /submit could instead start another paid prototype attempt, which this conversion-only request does not authorize. A new prototype attempt requires a separate caller decision.",
+      "local_actions": [
+        "Inspect the supplied current geometry_alpha.status=failed; treat readiness as unmet even though authored_to_simready is priced at zero.",
+        "Retain composition_id=cmp-failed and its worker timeout error; do not call /submit, change engines, regenerate, or upload replacement artifacts."
+      ]
+    },
+    {
+      "id": "zero_simulation",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/conversions/job-ok/simulate",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"scene\":\"drop\"}"
+        }
+      ],
+      "result": "Simulation handle: sim-new; source_job_id: job-ok; status: queued; credits_charged: 0. This is a separate drop-simulation job, not the source conversion handle; no polling requested.",
+      "local_actions": [
+        "Use the already-read completed authored_to_simready source and available simulate_usd=0 price; zero is valid.",
+        "Retain simulation_id=sim-new separately from source conversion_id=job-ok; stop after HTTP 202 acceptance."
+      ]
+    },
+    {
+      "id": "missing_simulation_price",
+      "requests": [],
+      "result": "Simulation not submitted; no new handle. simulate_usd is absent from current pricing and is unavailable, not free. authored_to_simready=0 and glb_to_simready=5 cannot substitute for it. Resolve the missing simulation price before requesting submission again.",
+      "local_actions": [
+        "Use the supplied current source and pricing snapshots; detect the absent simulate_usd key.",
+        "Retain source conversion_id=job-ok; do not POST /simulate or retry automatically."
+      ]
+    },
+    {
+      "id": "wrapped_failure",
+      "requests": [],
+      "result": "The creation response was HTTP 502: Automated composition failed. It nevertheless saved composition cmp-saved. The current workflow is failed because Credit pricing unavailable for articulated_prototype_codex; no usable prototype is available. Charges/refunds were not returned and remain unknown. Resolve that exact missing price before authorizing another attempt; rigid pricing is not a substitute.",
+      "local_actions": [
+        "Normalize last_response.error and retain last_response.data.id=cmp-saved with data.workflow.error.",
+        "Use the already-read failed composition and current missing articulated_prototype_codex price; do not recreate, retry a POST, switch to a rigid asset, or poll a terminal failed workflow."
+      ]
+    },
+    {
+      "id": "upload_only",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-ready/geometry-artifacts",
+          "authentication": "rigyd",
+          "encoding": "multipart",
+          "body_json": "{\"glb\":{\"file\":\"asset.glb\"},\"manifest\":\"{\\\"manifest_version\\\":1,\\\"asset_class\\\":\\\"rigid\\\",\\\"unit\\\":\\\"m\\\",\\\"up_axis\\\":\\\"Y\\\",\\\"root_node\\\":\\\"root\\\",\\\"links\\\":[{\\\"name\\\":\\\"root\\\",\\\"node\\\":\\\"root\\\"}]}\",\"captures\":[{\"file\":\"mesh_top.png\"}]}"
+        }
+      ],
+      "result": "Updated composition: {\"id\":\"cmp-ready\",\"geometry_alpha\":{\"status\":\"ready\",\"artifacts\":{\"glb\":{\"url\":\"https://assets.example/asset.glb\"}}}}. HTTP 201 stored the artifacts; no conversion, regeneration, simulation, or sharing was requested.",
+      "local_actions": [
+        "Use the already-read ready rigid geometry; read manifest.json and serialize its object as the manifest multipart field, not as a file upload.",
+        "Validate asset.glb is nonempty and at most 500 MB, matches the exported rigid link geometry and metre/Y-up manifest, and uses TEXCOORD_0 for texture maps; validate mesh_top.png is PNG.",
+        "Upload the existing exported GLB and capture without re-exporting or adding an invented checksum; retain the returned composition/artifact state and stop."
+      ]
+    },
+    {
+      "id": "gallery_download",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://assets.example/cabinet.zip",
+          "authentication": "none",
+          "encoding": "none",
+          "body_json": ""
+        }
+      ],
+      "result": "Gallery cabinet-demo detail is already available: source conversion source-job, completed, asset license CC0-1.0. Use its public MJCF package https://assets.example/cabinet.zip for the requested local use; planned archive path: ./assets/cabinet.zip. No package bytes or archive listing are supplied, so download completion and the extracted XML entrypoint are unverified.",
+      "local_actions": [
+        "Use the already-read gallery detail associated with slug cabinet-demo, not source-job as a gallery identifier; retain the source conversion ID and CC0-1.0 license.",
+        "Download the public output.mjcf_package URL without a Rigyd bearer token; do not use owner-only /conversions/source-job/result or change sharing.",
+        "Save the ZIP as ./assets/cabinet.zip without overwriting an existing file; inspect and safely extract its actual relative tree for local use, preserving meshes/textures and reporting an XML entrypoint only when observed."
+      ]
+    },
+    {
+      "id": "legacy_download",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/conversions/job-legacy/result?format=usd",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": ""
+        },
+        {
+          "method": "GET",
+          "url": "https://storage.example/legacy.zip",
+          "authentication": "none",
+          "encoding": "none",
+          "body_json": ""
+        }
+      ],
+      "result": "USD import entrypoint from the supplied archive listing: ./assets/usd/cabinet/cabinet.usd. Keep ./assets/usd/cabinet/payloads/body.usd and ./assets/usd/cabinet/textures/wood.png in their original relative locations. The owned result response is JSON, not ZIP bytes; fetch its data.url without forwarding the Rigyd token.",
+      "local_actions": [
+        "Use the already-read completed source job; handle the recorded HTTP 200 application/json result response by parsing data.url instead of saving JSON as a ZIP.",
+        "Create ./assets if needed and save the external ZIP as ./assets/job-legacy-usd.zip without overwriting existing files; strip Rigyd authentication on the external URL and cross-host redirects.",
+        "Inspect the supplied archive paths and safely extract into ./assets with the complete relative directory tree; use cabinet.usd as the entrypoint, not payloads/body.usd."
+      ]
+    },
+    {
+      "id": "resume_status",
+      "requests": [],
+      "result": "Cabinet: conversion job-cabinet completed, reusable for instances left and right, but NOT ready for the requested Robotics-Prop validation. report.validation.spec_release=2026.08.0; targeted_profiles=[Robotics-Prop]; profiles[Robotics-Prop].status=FAIL; optional_unmet=[mujoco_import]. Robot-Body PASS is incidental and does not satisfy Robotics-Prop or prove MuJoCo import/scene behavior. Lamp cmp-running is still running; table cmp-table failed with render timeout. No additional work scheduled.",
+      "local_actions": [
+        "Resume the caller mapping from supplied current snapshots; inspect each unique asset once and reuse cabinet conversion_id=job-cabinet for both existing instances.",
+        "Retain cabinet completion and per-target validation evidence separately; mark it not ready for Robotics-Prop rather than using profiles_passing=[Robot-Body] as the verdict.",
+        "Update the existing in-memory asset state with lamp running and table failed, preserving all handles and instances; isolate table failure from its siblings.",
+        "Do not issue redundant status reads, regenerate, submit, simulate, download, share, or claim assembled-environment validation."
+      ]
+    },
+    {
+      "id": "reference_only",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-ref/prerender",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"instruction\":\"matte blue finish\",\"mode\":\"fresh\"}"
+        }
+      ],
+      "result": "Fresh reference for composition cmp-ref: media ID 42, URL https://assets.example/ref.png. This is a reference image only, not a prototype or conversion.",
+      "local_actions": [
+        "Use the already-read desk-lamp draft and send mode=fresh explicitly, avoiding the default edit behavior.",
+        "Retain composition_id=cmp-ref and reference media_id=42 separately; return the reference without selecting it, downloading it, starting a prototype, or converting."
+      ]
+    }
+  ]
+}

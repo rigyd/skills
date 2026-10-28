@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rigyd API"
+  short_description: "Create, edit, convert, inspect and simulate assets"
+  default_prompt: "Use $rigyd-api for the requested Rigyd asset operation."

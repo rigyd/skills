@@ -1,0 +1,216 @@
+{
+  "cases": [
+    {
+      "id": "generate",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/generate",
+          "authentication": "rigyd",
+          "encoding": "multipart",
+          "body_json": "{\"prompt\":\"Cabinet with drawers for robot drawer-opening trials\",\"robot_task\":\"Robot drawer-opening trials\",\"asset_class\":\"articulated\",\"generation_method\":\"procedural\",\"geometry_builder\":\"responses\",\"auto_submit\":\"false\",\"negative_prompt\":\"extra handles\",\"physical_context\":\"{\\\"mass_kg\\\":12,\\\"dimensions_m\\\":{\\\"length\\\":0.7,\\\"height\\\":1},\\\"materials\\\":[\\\"wood\\\"],\\\"fixed_base\\\":true}\",\"images\":[{\"file\":\"front.png\"},{\"file\":\"right.png\"},{\"file\":\"back.png\"},{\"file\":\"left.png\"}]}"
+        }
+      ],
+      "result": "Submitted (HTTP 201). Composition handle: cmp-new (a composition ID, not a conversion ID). workflow.status=running. Settings: articulated, procedural Build, Responses builder, auto_submit=false, so the workflow stops at a reviewable prototype and no conversion starts. Price checked first: articulated_prototype = 5 credits. The response did not report the actual charge. I did not wait for or poll the composition.",
+      "local_actions": [
+        "Used the already-read pricing snapshot: data.pricing.articulated_prototype=5 is available for a Responses articulated Build",
+        "Attached the four reference images in front/right/back/left order as multipart images",
+        "Saved composition handle cmp-new in the caller's state"
+      ]
+    },
+    {
+      "id": "interactive_images",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/start",
+          "authentication": "rigyd",
+          "encoding": "multipart",
+          "body_json": "{\"input\":\"desk lamp\",\"images\":[{\"file\":\"a.png\"},{\"file\":\"b.png\"},{\"file\":\"c.png\"}]}"
+        }
+      ],
+      "result": "Interactive composition started (HTTP 201): cmp-lamp. enough_info=false and workflow=null. Questions to answer: q1 \"What size?\". Send your answers to POST /compositions/cmp-lamp/answer as {question_id:\"q1\", values, custom}. No prototype was started and no credits were reserved.",
+      "local_actions": [
+        "Saved composition handle cmp-lamp"
+      ]
+    },
+    {
+      "id": "brief_patch",
+      "requests": [
+        {
+          "method": "PATCH",
+          "url": "https://api.rigyd.com/api/compositions/cmp-brief",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"asset_brief\":{\"asset_class\":\"articulated\",\"confidence\":0.9,\"reasoning\":\"opening task\",\"articulation_hint\":[{\"name\":\"drawer\",\"joint_type\":\"prismatic\",\"travel_frac\":0.7}],\"declared\":{\"mass_kg\":12,\"materials\":[\"wood\"],\"dimensions_m\":{\"height\":1},\"fixed_base\":false}}}"
+        }
+      ],
+      "result": "Sent a direct PATCH to cmp-brief that sets asset_brief.declared.fixed_base=false. The API replaces asset_brief as a whole object, so the request included the full current brief with every other field unchanged. The prompt fields and generation method were not touched. No prototype was started and no charge applies. Check the returned composition for any dependent state.",
+      "local_actions": [
+        "Merged the edit into the full asset_brief from the already-read snapshot, because the API replaces the brief rather than patching it"
+      ]
+    },
+    {
+      "id": "convert_failed_prototype",
+      "requests": [],
+      "result": "No conversion was started, so there is no conversion handle. cmp-failed has geometry_alpha.status=failed (error: worker timeout) and no ready prototype or stored artifacts. Calling /compositions/cmp-failed/submit in this state would start another paid prototype attempt, not a conversion. Prerequisite to convert: a ready Build prototype with exported artifacts. Getting one needs a new attempt that you request explicitly (articulated_prototype_codex is currently 40 credits). Conversion of a ready prototype (authored_to_simready) would then cost 0.",
+      "local_actions": [
+        "Checked the already-read composition: Build failed, no geometry_alpha.artifacts",
+        "Did not call /submit"
+      ]
+    },
+    {
+      "id": "zero_simulation",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/conversions/job-ok/simulate",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"scene\":\"drop\"}"
+        }
+      ],
+      "result": "Drop simulation accepted (HTTP 202). New simulation job ID: sim-new (source_job_id job-ok). status=queued, credits_charged=0; simulate_usd pricing is 0, which is a valid available price. I did not poll it. When you want results, check GET /conversions/sim-new. This is a single-asset drop test, not a scene-level test.",
+      "local_actions": [
+        "Confirmed job-ok is a completed authored_to_simready conversion and simulate_usd=0 is present in pricing",
+        "Saved simulation handle sim-new separately from the source conversion job-ok"
+      ]
+    },
+    {
+      "id": "missing_simulation_price",
+      "requests": [],
+      "result": "No simulation was started. The current pricing has no simulate_usd key, which means simulation pricing is unavailable; there is no fallback price to assume. job-ok is a completed conversion and would otherwise qualify. Retry the request once simulate_usd pricing is published.",
+      "local_actions": [
+        "Checked the already-read pricing: simulate_usd is absent"
+      ]
+    },
+    {
+      "id": "wrapped_failure",
+      "requests": [],
+      "result": "The creation call returned 502 'Automated composition failed', but it saved a composition: cmp-saved. Its workflow.status=failed with error 'Credit pricing unavailable for articulated_prototype_codex'. Prototype start failed because no price is available for an articulated Codex Build. The only available prototype price is rigid_prototype=5; articulated_prototype is also missing. No prototype was produced. I did not retry automatically because missing pricing needs a decision from you. You can wait until articulated pricing is available, or explicitly choose a different, priced configuration (a rigid asset can't open or articulate). Keep cmp-saved as the handle.",
+      "local_actions": [
+        "Kept data.id=cmp-saved from the 502 response in the caller's state",
+        "Read data.workflow.error and compared it with the already-read pricing"
+      ]
+    },
+    {
+      "id": "upload_only",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-ready/geometry-artifacts",
+          "authentication": "rigyd",
+          "encoding": "multipart",
+          "body_json": "{\"glb\":{\"file\":\"asset.glb\"},\"manifest\":\"{\\\"manifest_version\\\":1,\\\"asset_class\\\":\\\"rigid\\\",\\\"unit\\\":\\\"m\\\",\\\"up_axis\\\":\\\"Y\\\",\\\"root_node\\\":\\\"root\\\",\\\"links\\\":[{\\\"name\\\":\\\"root\\\",\\\"node\\\":\\\"root\\\"}]}\",\"captures\":[{\"file\":\"mesh_top.png\"}]}"
+        }
+      ],
+      "result": "Artifacts stored (HTTP 201) on cmp-ready. geometry_alpha.status=ready, and artifacts.glb.url is https://assets.example/asset.glb. The manifest (rigid, metres, Y-up, root link) and the mesh_top.png capture were included. No conversion was submitted; converting is a separate /compositions/cmp-ready/submit request if you want it.",
+      "local_actions": [
+        "Confirmed geometry_alpha is ready and the manifest is rigid with links matching the rigid geometry, unit=m, up_axis=Y",
+        "Read manifest.json and sent its contents as the manifest field",
+        "Attached mesh_top.png as a capture"
+      ]
+    },
+    {
+      "id": "gallery_download",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/demo-assets/cabinet-demo",
+          "authentication": "none",
+          "encoding": "none",
+          "body_json": "{}"
+        },
+        {
+          "method": "GET",
+          "url": "https://assets.example/cabinet.zip",
+          "authentication": "none",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Gallery detail for 'Cabinet' (slug cabinet-demo; source conversion source-job): status completed, asset_license CC0-1.0. Downloaded its public MJCF package anonymously from output.mjcf_package (https://assets.example/cabinet.zip). CC0-1.0 permits local use. Use the mjcf/<name>.xml file found in the extracted package as the entrypoint, and keep the meshes/textures directories next to it.",
+      "local_actions": [
+        "Looked up the gallery detail by slug, not by the card's source-conversion ID",
+        "Checked report.simready_metadata.asset_license = CC0-1.0",
+        "Saved cabinet.zip and extracted it with the full relative directory tree",
+        "Checked the archive for the MJCF XML entrypoint instead of assuming a layout"
+      ]
+    },
+    {
+      "id": "legacy_download",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/conversions/job-legacy/result?format=usd",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        },
+        {
+          "method": "GET",
+          "url": "https://storage.example/legacy.zip",
+          "authentication": "none",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Downloaded job-legacy's USD package into ./assets. This is a legacy record, so the result endpoint returned JSON with a storage URL, which was fetched without the Rigyd token. Import entrypoint: ./assets/usd/cabinet/cabinet.usd. Keep its payloads (./assets/usd/cabinet/payloads/body.usd) and textures (./assets/usd/cabinet/textures/wood.png) with it.",
+      "local_actions": [
+        "Read the content type application/json and took data.url",
+        "Fetched the storage URL without forwarding the Rigyd Authorization header",
+        "Saved legacy.zip and extracted it into ./assets, keeping the full relative tree: usd/cabinet/cabinet.usd, usd/cabinet/payloads/body.usd, usd/cabinet/textures/wood.png",
+        "Found the entrypoint by inspecting the archive"
+      ]
+    },
+    {
+      "id": "resume_status",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/conversions/job-cabinet",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        },
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/compositions/cmp-running",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        },
+        {
+          "method": "GET",
+          "url": "https://api.rigyd.com/api/compositions/cmp-table",
+          "authentication": "rigyd",
+          "encoding": "none",
+          "body_json": "{}"
+        }
+      ],
+      "result": "Status (read only; nothing was scheduled):\n- cabinet (job-cabinet): conversion completed, but it does not meet the Robotics-Prop target. Validation spec_release 2026.08.0, targeted profile Robotics-Prop = FAIL, optional_unmet: mujoco_import. Robot-Body PASS is an incidental pass and not the profile you need. One cabinet asset serves both instances (left, right), so no regeneration is needed for them, but there is no Robotics-Prop validation evidence yet.\n- lamp (cmp-running): still running, not ready.\n- table (cmp-table): failed with 'render timeout'. It was kept on its own and not retried, and it does not affect the other assets.\nNothing currently meets your Robotics-Prop requirement.",
+      "local_actions": [
+        "Loaded the caller's checkpoint and reused known handles",
+        "Mapped both instances (left, right) to the single cabinet asset job-cabinet",
+        "Updated the checkpoint statuses: cabinet completed (Robotics-Prop FAIL), lamp running, table failed",
+        "Did not submit, retry or simulate anything"
+      ]
+    },
+    {
+      "id": "reference_only",
+      "requests": [
+        {
+          "method": "POST",
+          "url": "https://api.rigyd.com/api/compositions/cmp-ref/prerender",
+          "authentication": "rigyd",
+          "encoding": "json",
+          "body_json": "{\"instruction\":\"matte blue finish\",\"mode\":\"fresh\"}"
+        }
+      ],
+      "result": "Fresh reference image created (HTTP 201) for cmp-ref: prerender media ID 42, URL https://assets.example/ref.png. It is a reference image only. It has not been selected as the composition's reference, and no prototype was started.",
+      "local_actions": [
+        "Kept media ID 42 separate from composition ID cmp-ref"
+      ]
+    }
+  ]
+}
