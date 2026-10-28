@@ -1,6 +1,6 @@
 # Rigyd API skill validation
 
-Release candidate: **v0.1.0**, reviewed 28 October 2026. Portable source: `skills/rigyd-api`. Publisher: `rigyd/skills`; license: MIT. Tagged release and expanded public docs deployment remain pending.
+Release: **v1.0.0**, reviewed 28 October 2026. Portable source: `skills/rigyd-api`. Publisher: `rigyd/skills`; license: MIT.
 
 ## Contract and packaging
 
@@ -8,7 +8,7 @@ The skill covers all **25 customer HTTP bindings** in the reviewed API, includin
 
 Skill Creator's validator passes. All seven local reference links and their public Markdown targets resolve against the built docs. `npx skills add . --list` discovers exactly one `rigyd-api` skill. The skill folder contains no credentials, private workspace paths or private-repository dependencies. The release ZIP contains only the portable skill folder and its optional Codex metadata.
 
-The Astro docs build passes with 27 pages. New interactive, geometry, sharing, gallery and orchestration pages have Markdown exports. All three generated agent indexes exclude account, billing and internal endpoints. These changes are local and need deployment before the new public links are advertised as live.
+The Astro docs build passes with 27 pages. New interactive, geometry, sharing, gallery and orchestration pages have Markdown exports. All three generated agent indexes exclude account, billing and internal endpoints. These pages are deployed to docs.rigyd.com, and all 17 documentation links in the skill return 200.
 
 ## Independent host evaluation
 
@@ -74,4 +74,4 @@ These checks establish instruction routing, request-plan behavior and the tested
 
 The repository is published as `rigyd/skills` under MIT. Skills CLI 1.7.4 discovered exactly one skill from the remote repository, and a clean project install for Claude Code and Codex succeeded. All nine files in both installed skill folders matched the published source byte-for-byte. The [skills.sh directory page](https://skills.sh/rigyd/skills/rigyd-api) returned 200 and displayed the skill instructions.
 
-Deploy the synchronized docs before tagging v0.1.0; the expanded linked pages currently return 404. No tag or native marketplace submission has been created.
+Tagged v1.0.0 after the synchronized docs were deployed and every linked page returned 200. No native marketplace submission has been created.
