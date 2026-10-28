@@ -1,6 +1,6 @@
 # Asset provisioning for an orchestrator
 
-Guide: [agent orchestration](https://docs.rigyd.com/guides/agent-orchestration.md).
+Related: [download](https://docs.rigyd.com/jobs/download.md), including combining MJCF packages in one scene.
 
 Rigyd provides per-asset operations. The caller owns scene specifications, unique asset definitions, instances/transforms, dependency ordering, robot/controllers, import, budget, concurrency and environment tests. Do not impose a scene recipe, object category, simulator, provider, fixed concurrency or budget when the caller has its own policy.
 

@@ -1,6 +1,6 @@
 # Build geometry and exported artifacts
 
-Contract, including scaffold message protocol: [geometry operations](https://docs.rigyd.com/compositions/geometry.md). These are customer operations on an owned composition, not worker callbacks or an arbitrary asset-ingestion API.
+Revision is documented in [compose an asset](https://docs.rigyd.com/compositions/generate.md#revise-build-geometry). The scaffold, export and artifact-upload contract below is not in the public docs; this reference is the contract. These are customer operations on an owned composition, not worker callbacks or an arbitrary asset-ingestion API.
 
 ## prototype.inspect / prototype.revise
 
@@ -14,7 +14,7 @@ Ready geometry without feedback gives `409` asking for revision feedback. Feedba
 
 `GET /geometry-alpha/scaffold?ground_version=<recorded version>` requires authentication and returns `{data:{version,html}}`. Omit version only for a new default ground. An unknown version returns `422`. Load existing source with its saved ground rather than upgrading it implicitly.
 
-For a requested artifact export, run that HTML/source in an isolated browser rendering context using the protocol documented on the linked page. The scaffold produces the matching GLB, manifest and canonical captures in the delivered zero pose. Export is local work, not another HTTP generation endpoint. If the host lacks a browser/export capability, return the ready handle and exact missing export prerequisite; do not replace Build geometry by regenerating it with Tripo.
+For a requested artifact export, run that HTML/source in an isolated iframe with WebGL, using the message protocol below. The host supplies the Three.js module sources; the ground does not fetch dependencies itself. Do not give generated geometry access to secrets or the surrounding application. The scaffold produces the matching GLB, manifest and canonical captures in the delivered zero pose. Export is local work, not another HTTP generation endpoint. If the host lacks a browser/export capability, return the ready handle and exact missing export prerequisite; do not replace Build geometry by regenerating it with Tripo.
 
 The pinned runtime is Three.js revision 183. Parent-to-iframe `rigyd-geometry-load` carries `groundVersion`, `assetSource`, `assetClass`, `threeSource` (`three.module.min.js`), `threeCoreSource` (`three.core.min.js`) and matching `exporterSource` (`examples/jsm/exporters/GLTFExporter.js`). The ground creates module blobs internally. Verify incoming messages come from that iframe. Wait for `rigyd-geometry-ready`, then send `rigyd-geometry-export-glb`; `rigyd-geometry-glb` returns `buffer` (ArrayBuffer), `manifest`, `captures` (`{role,data_url}`). Save the buffer and decode captures to the canonical PNG filenames. A `rigyd-geometry-error` ends that export attempt; retain the prototype handle.
 

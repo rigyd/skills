@@ -1,6 +1,6 @@
 # Visibility and public assets
 
-Contracts: [sharing](https://docs.rigyd.com/jobs/sharing.md), [gallery](https://docs.rigyd.com/assets/catalog.md).
+Sharing and gallery endpoints are not in the public docs; this reference is the contract.
 
 | Operation | HTTP binding | Request / result |
 | --- | --- | --- |

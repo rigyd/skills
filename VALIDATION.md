@@ -8,7 +8,7 @@ The skill covers all **25 customer HTTP bindings** in the reviewed API, includin
 
 Skill Creator's validator passes. All seven local reference links and their public Markdown targets resolve against the built docs. `npx skills add . --list` discovers exactly one `rigyd-api` skill. The skill folder contains no credentials, private workspace paths or private-repository dependencies. The release ZIP contains only the portable skill folder and its optional Codex metadata.
 
-The Astro docs build passes with 27 pages. New interactive, geometry, sharing, gallery and orchestration pages have Markdown exports. All three generated agent indexes exclude account, billing and internal endpoints. These pages are deployed to docs.rigyd.com, and all 17 documentation links in the skill return 200.
+The Astro docs build passes with 23 pages. The public docs are limited to API reference: sharing, gallery, geometry scaffold/export and orchestration guidance live only in the skill references, which state that they are the contract. All three generated agent indexes exclude account, billing and internal endpoints. Every documentation link in the skill returns 200.
 
 ## Independent host evaluation
 
