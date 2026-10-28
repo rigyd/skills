@@ -46,4 +46,6 @@ Five scenarios passed: paid conversion, zero-priced conversion, omitted pricing 
 
 These checks establish instruction routing, request-plan behavior and the tested multipart integration. They do not establish live generation quality, production availability, actual geometry export, simulator import or multi-asset scene correctness. Browser export needs the pinned rendering ground and Three.js runtime; durable exactly-once paid submission remains an API limitation.
 
-The repository is published as `rigyd/skills` under MIT. Remote discovery and isolated installation for Claude Code and Codex are checked during publication. Deploy the synchronized docs before tagging v0.1.0; the expanded linked pages currently return 404. No tag or native marketplace submission has been created.
+The repository is published as `rigyd/skills` under MIT. Skills CLI 1.7.4 discovered exactly one skill from the remote repository, and a clean project install for Claude Code and Codex succeeded. All nine files in both installed skill folders matched the published source byte-for-byte. The [skills.sh directory page](https://skills.sh/rigyd/skills/rigyd-api) returned 200 and displayed the skill instructions.
+
+Deploy the synchronized docs before tagging v0.1.0; the expanded linked pages currently return 404. No tag or native marketplace submission has been created.

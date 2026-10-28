@@ -2,6 +2,8 @@
 
 Portable customer asset operations for Claude Code and Codex. The same `skills/rigyd-api` directory uses the Agent Skills format; optional `agents/openai.yaml` supplies Codex UI metadata.
 
+Available on [skills.sh](https://skills.sh/rigyd/skills/rigyd-api).
+
 ## Install
 
 ```sh
