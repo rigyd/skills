@@ -55,6 +55,19 @@ Claude Code generated a standalone Node integration using the final multipart gu
 
 Five scenarios passed: paid conversion, zero-priced conversion, omitted pricing without submission, ambiguous POST failure without retry, and missing reported charge retained as unknown. Each successful attempt made one pricing read and one conversion POST; no simulation, sharing or polling followed. Only a fixture key was used, and no production requests were made. The generated integration is evaluation material, not a shipped SDK or skill runtime helper.
 
+## Field-feedback revision (28 October 2026)
+
+An agent that used the skill to provision a multi-asset MuJoCo scene reported 14 gaps. Each was checked against the API controllers (`composer.ts`, billing routes) and the Physiq MJCF exporters before changing the skill:
+
+- `/compositions/generate` returns `202`, also for a coalesced in-flight duplicate. Any `2xx` is treated as accepted, and the generate fixture in `tests/cases.json` now uses `202`.
+- `conversion_job_id` is top-level on the composition (not under `workflow`), shown with a completed-response example.
+- Where charges are reported: Generate `rigid_prototype.credits_charged`, conversion/simulation `credits_charged`. A Build charge is not reported. Actual spend can be checked with `GET /me` balance or the browser billing history.
+- Codex vs Responses trade-off, and a worked prototype-price table for Auto routing.
+- New "Combining MJCF assets in one scene" guidance: per-file ground planes, colliding names and unnamed defaults, max-friction contact pairing, non-rolling casters, and the Build facing convention (+Z Y-up → −Y Z-up, to be verified).
+- Credentials in non-interactive shells and `~/.config/rigyd/config.json`, a minimal curl sequence, per-asset `robot_task`, and prompt-derived entry-point names.
+
+Offline with-skill vs previous-skill evaluation in Claude Code (three cases: scene pricing, status script, MJCF scene merge): **17/17** assertions for the revision vs **13/17** for the previous skill. The previous skill missed the Codex trade-off, the charge fields/balance check and the non-interactive shell note, and quoted `201`. The existing behavior, atomic and public-content checks above still pass. Exporter changes that remove these MJCF merge issues at the source are tracked separately in Physiq.
+
 ## Limits and release gates
 
 These checks establish instruction routing, request-plan behavior and the tested multipart integration. They do not establish live generation quality, production availability, actual geometry export, simulator import or multi-asset scene correctness. Browser export needs the pinned rendering ground and Three.js runtime; durable exactly-once paid submission remains an API limitation.

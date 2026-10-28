@@ -6,7 +6,7 @@ HTTP paths below are relative to `/api`; all require customer authentication. Co
 
 `POST /compositions/generate` creates an automatic composition and starts its prototype. This is a composite convenience operation, not just planning.
 
-Required `prompt` and `robot_task`: nonempty strings, each at most 2000 characters. Use the actual task supplied by the caller; do not invent robot behavior to fill a template. Optional fields:
+Required `prompt` and `robot_task`: nonempty strings, each at most 2000 characters. Use the actual task supplied by the caller; do not invent robot behavior to fill a template. `robot_task` feeds prompt composition and Build/Generate and rigid/articulated routing for this one asset. In a multi-asset scene, give each asset the part of the task that involves it: "push the IV pole beside the bed" for the pole, "open the top drawer" for the nightstand. A scene-wide task sent to every asset can push routing toward parts that belong to other objects. Add brief scene context only where it changes this asset's requirements. Optional fields:
 
 | Field | Contract |
 | --- | --- |
@@ -18,7 +18,19 @@ Required `prompt` and `robot_task`: nonempty strings, each at most 2000 characte
 | `physical_context` | Object: positive `mass_kg`; `dimensions_m` with positive `length`, `width`, `height` (subset allowed); `materials` string array; `fixed_base` boolean |
 | `images` / `images[]` | Multipart files: 0, 1 or 4 JPEG/PNG/WebP, at most 10 MB each; four ordered front/right/back/left |
 
-Use JSON without images, multipart with images. JSON-encode object fields in multipart; booleans can be strings `true`/`false`. Do not send image URLs in place of uploads. Creation returns `201` with `data.id` (composition), not a conversion ID. Return that handle; wait only when requested. With `auto_submit=false`, the workflow stops at a reviewable prototype. With true, follow `conversion_job_id` after conversion is created.
+Use JSON without images, multipart with images. JSON-encode object fields in multipart; booleans can be strings `true`/`false`. Do not send image URLs in place of uploads. Acceptance returns `202` with `data.id` (composition), not a conversion ID. An identical request that is still in flight also returns `202` with the same composition. Return that handle; wait only when requested. With `auto_submit=false`, the workflow stops at a reviewable prototype. With true, the conversion ID appears at top-level `data.conversion_job_id`, next to `data.conversion_job_status`. It is not inside `workflow`, and it stays `null` until conversion is created. A completed auto-conversion looks like:
+
+```json
+{"data": {
+  "id": "cmp-id",
+  "workflow": {"status": "completed", "stage": "simready_conversion", "progress": 100, "error": null, "assumptions": []},
+  "rigid_prototype": null,
+  "conversion_job_id": "job-id",
+  "conversion_job_status": "completed"
+}}
+```
+
+`rigid_prototype` is populated only for Generate prototypes (with `credits_charged`). Build state is in `geometry_alpha`.
 
 Rigid describes simulation behavior, not a method: Auto may choose either method. Generate cannot deliver working articulation. Legacy deformable/mixed briefs can be simplified to rigid/articulated with `simplified_from`; expose that limitation when it affects the request. A prototype is not evidence that deformability or the complete environment was simulated.
 
@@ -26,7 +38,7 @@ Rigid describes simulation behavior, not a method: Auto may choose either method
 
 `GET /compositions/:id` returns the full owned composition. `GET /compositions?page=1&pageSize=25` returns `data` array, newest first, with page size capped at 100 and **no pagination metadata**. The list omits geometry source and artifact manifest; get a single record for those.
 
-Automatic records expose `workflow.status`, `stage`, `progress`, `error`, `assumptions`. Interactive records may have `workflow=null`. Read `geometry_alpha.status` for Build; `rigid_prototype.status`, `stage`, `model` for Generate. Use `GET /compositions/:id/geometry-alpha` to refresh an interactive Build. Media IDs in images/prerenders are distinct from document IDs.
+Automatic records expose `workflow.status`, `stage`, `progress`, `error`, `assumptions`, plus top-level `conversion_job_id`/`conversion_job_status`. Interactive records may have `workflow=null`. Read `geometry_alpha.status` for Build; `rigid_prototype.status`, `stage`, `model` for Generate. Use `GET /compositions/:id/geometry-alpha` to refresh an interactive Build. Media IDs in images/prerenders are distinct from document IDs.
 
 ## prototype.start / prototype.convert
 

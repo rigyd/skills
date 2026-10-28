@@ -25,7 +25,9 @@ Use the caller's checkpoint format. If none exists and multi-asset orchestration
 }
 ```
 
-These are caller state fields, not Rigyd API arguments. Store requested parameters/estimated stage costs where needed for reconciliation. An unknown charge stays null. One completed asset definition may serve multiple scene instances without regenerating it.
+These are caller state fields, not Rigyd API arguments. `conversion_id` comes from the composition's top-level `conversion_job_id`. `reported_charge` is filled only where the API reports one (see "Where charges appear" in the skill).
+
+Give each asset its own `robot_task`: the part of the scene task that involves that object. A shared scene-wide task can mislead routing; see the composition reference. Store requested parameters/estimated stage costs where needed for reconciliation. An unknown charge stays null. One completed asset definition may serve multiple scene instances without regenerating it.
 
 On resume, inspect known handles and reuse completed work. Continue only the requested missing operations. Retain a failed asset independently so it does not invalidate completed siblings. On deadline or partial failure, return the mapping and unmet prerequisites. Restarting the process must not automatically repeat accepted submissions.
 
@@ -33,4 +35,4 @@ Saving an ID after acceptance reduces duplicate work but cannot close the crash 
 
 Budget each separately priced stage using current available keys. Auto can select a different prototype price, and prototype conversion/simulation are separate charges. Respect the caller's ceiling before dispatch; absent budget policy is not unlimited spending authorization. Use actual amounts when returned, without assuming refunds or unreported costs.
 
-For handoff, provide per-asset entrypoint paths, package dependencies, source/license, delivered frame/units/scale, joint contract and validation evidence. Scene transforms belong to instances. Run assembled-environment tests in the caller's simulator when requested and available. A per-asset conversion or demo/drop PASS does not establish that several assets interact correctly in that environment.
+For handoff, provide per-asset entrypoint paths (read from each archive), package dependencies, source/license, delivered frame/units/scale, front direction, joint contract and validation evidence. When MJCF files will share one scene, pass on the merge caveats in the results reference: per-file ground planes, colliding names and default classes, max-friction contact pairing, and non-rolling casters. Scene transforms belong to instances. Run assembled-environment tests in the caller's simulator when requested and available. A per-asset conversion or demo/drop PASS does not establish that several assets interact correctly in that environment.

@@ -3,7 +3,7 @@
     {
       "id": "generate",
       "request": "Create a prototype of a cabinet for robot drawer-opening trials. Use articulated procedural Build with Responses, no automatic conversion. The four reference files are front.png, right.png, back.png, left.png. Mass is 12 kg, length 0.7 m, height 1 m, wood, fixed base. Negative prompt: extra handles. Return the submission handle.",
-      "snapshots": {"pricing":{"articulated_prototype":5},"accepted":{"http":201,"data":{"id":"cmp-new","workflow":{"status":"running"}}}}
+      "snapshots": {"pricing":{"articulated_prototype":5},"accepted":{"http":202,"data":{"id":"cmp-new","workflow":{"status":"running"}}}}
     },
     {
       "id": "interactive_images",
