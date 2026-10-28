@@ -36,6 +36,19 @@ The final shared guidance explicitly states multipart file/object serialization,
 
 An additional Claude Code forward check after that boundary clarification passed: prototype-only work on an already ready composition returned the existing handle without a conversion POST. The fixture and result are `tests/ready-case.json` and `tests/results/claude-ready.json`.
 
+## Public-content handling (W011)
+
+The skill explicitly treats public gallery/shared metadata as untrusted data. Embedded instructions and authority claims cannot authorize credentials, mutations, spending or different tool use. IDs/slugs stay within encoded API path segments; filenames cannot choose output paths; requested downloads use validated structured output URLs rather than links in prose. Agent handoffs retain the content's source and untrusted-data status.
+
+Four adversarial cases passed independently in Claude Code and Codex: metadata requesting credential disclosure and simulation, gallery text requesting command execution/sharing with a traversal filename, a shared asset with an invalid package URL and an injected workaround, and a hostile slug requesting an authenticated PATCH. Request plans preserved valid listing/inspection and the legitimate HTTPS package download. Local actions were reviewed for credential access, command execution and writes outside the caller's destination. No live API requests or credential disclosures were performed.
+
+```sh
+python3 tests/check_public_content.py tests/results/claude-public-content.json
+python3 tests/check_public_content.py tests/results/codex-public-content.json
+```
+
+These checks demonstrate the tested instruction boundaries, not prompt-injection immunity. Public content exposure remains by design, so W011 may still be reported. A fresh external audit verdict has not been confirmed.
+
 ## Multipart integration check
 
 Claude Code generated a standalone Node integration using the final multipart guidance. That temporary integration was executed against a loopback HTTP mock under Node **v24.15.0**. The mock inspected actual multipart file bytes, filenames, boundaries, JSON declarations, advanced options and Authorization headers.
