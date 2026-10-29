@@ -28,6 +28,6 @@ The skill exposes 25 customer HTTP bindings through seven focused references. It
 
 Published under the [MIT license](LICENSE). Validation evidence lives in [VALIDATION.md](VALIDATION.md), outside the loaded skill.
 
-Current release: [v1.0.0](https://github.com/rigyd/skills/releases/tag/v1.0.0). Every public documentation page the skill links to is live. The public docs cover the API reference; sharing, gallery reads, the geometry scaffold/export protocol and orchestration guidance are documented only in this skill's references.
+Current release: [v1.0.1](https://github.com/rigyd/skills/releases/tag/v1.0.1). Every public documentation page the skill links to is live. The public docs cover the API reference; sharing, gallery reads, the geometry scaffold/export protocol and orchestration guidance are documented only in this skill's references.
 
 skills.sh tracks installations through the Skills CLI and lists skills automatically. Listing and ranking can lag behind repository publication.

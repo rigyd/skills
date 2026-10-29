@@ -1,6 +1,6 @@
 # Rigyd API skill validation
 
-Release: **v1.0.0**, reviewed 28 October 2026. Portable source: `skills/rigyd-api`. Publisher: `rigyd/skills`; license: MIT.
+Release: **v1.0.1**, reviewed 29 October 2026. Portable source: `skills/rigyd-api`. Publisher: `rigyd/skills`; license: MIT.
 
 ## Contract and packaging
 
@@ -74,4 +74,4 @@ These checks establish instruction routing, request-plan behavior and the tested
 
 The repository is published as `rigyd/skills` under MIT. Skills CLI 1.7.4 discovered exactly one skill from the remote repository, and a clean project install for Claude Code and Codex succeeded. All nine files in both installed skill folders matched the published source byte-for-byte. The [skills.sh directory page](https://skills.sh/rigyd/skills/rigyd-api) returned 200 and displayed the skill instructions.
 
-Tagged v1.0.0 after the synchronized docs were deployed and every linked page returned 200. No native marketplace submission has been created.
+Tagged v1.0.0 after the synchronized docs were deployed and every linked page returned 200. v1.0.1 repoints the references after the public docs were trimmed to API reference; every linked page on the new deployment returned 200. No native marketplace submission has been created.
