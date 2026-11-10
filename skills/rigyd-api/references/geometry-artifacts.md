@@ -4,13 +4,15 @@ Revision is documented in [compose an asset](https://docs.rigyd.com/compositions
 
 ## prototype.inspect / prototype.revise
 
-`GET /compositions/:id/geometry-alpha` refreshes Build state and returns the composition. `geometry_alpha.status=building|ready|failed`; ready state exposes source, manifest and its recorded `ground_version`. GET can refresh/reconcile server state; it does not request another prototype.
+`GET /compositions/:id/geometry-alpha` refreshes Build state and returns the composition. `geometry_alpha.status=building|ready|failed`. A ready Blender build (`builder=blender`, `ground_version` `blender-*`) already carries `geometry_alpha.artifacts` (GLB, manifest, captures) and has `source: null`; skip scaffold, export and upload and go straight to a requested conversion. Older Three.js builds expose `source`, manifest and their recorded `ground_version`, and may still need the export below. GET can refresh/reconcile server state; it does not request another prototype.
 
-`POST /compositions/:id/geometry-alpha` accepts optional `geometry_builder=codex|responses`, first-attempt `generation_method=auto|procedural|generative`, and `feedback` (≤2000 characters). A first attempt honors method/Auto via prototype routing; this legacy path does not always force Build. To revise, require a ready procedural prototype and send nonempty feedback. Preserve its original builder and class. A valid revision reuses its prototype reservation; failed-settled attempts or an explicit new attempt can charge again. Do not apply a separate revision price or assume all retries are free.
+`POST /compositions/:id/geometry-alpha` accepts optional `geometry_builder` (omit it: every build and revision runs on Blender), first-attempt `generation_method=auto|procedural|generative`, and `feedback` (≤2000 characters). A first attempt honors method/Auto via prototype routing; this legacy path does not always force Build. To revise, require a ready procedural prototype and send nonempty feedback. Preserve its class. Revising an older Three.js prototype rebuilds it with Blender, applying the feedback. A valid revision reuses its prototype reservation; failed-settled attempts or an explicit new attempt can charge again. Do not apply a separate revision price or assume all retries are free.
 
 Ready geometry without feedback gives `409` asking for revision feedback. Feedback without a ready Build gives `409`; Generate cannot be revised through this geometry endpoint. Changing class requires a separately requested new attempt. Return the `202` composition handle unless waiting was requested.
 
 ## scaffold.get / artifact.export
+
+Only for older Three.js prototypes (`source` present, no `geometry_alpha.artifacts`). Blender builds never need this.
 
 `GET /geometry-alpha/scaffold?ground_version=<recorded version>` requires authentication and returns `{data:{version,html}}`. Omit version only for a new default ground. An unknown version returns `422`. Load existing source with its saved ground rather than upgrading it implicitly.
 

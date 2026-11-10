@@ -55,28 +55,27 @@ Before a paid stage, read `GET /conversions/pricing` → `data.pricing`. Zero is
 
 | Stage | Pricing key |
 | --- | --- |
-| Tripo Generate; Responses rigid Build | `rigid_prototype` |
-| Responses articulated Build | `articulated_prototype` |
-| Codex rigid/articulated Build | `rigid_prototype_codex` / `articulated_prototype_codex` |
+| Tripo Generate | `rigid_prototype` |
+| Rigid/articulated Build (Blender) | `rigid_prototype_codex` / `articulated_prototype_codex` |
 | Uploaded file conversion | `glb_to_simready` |
 | Ready prototype conversion | `authored_to_simready` |
 | Individual asset simulation | `simulate_usd` |
 
-`geometry_builder=codex|responses` selects the Build engine; it does not force Build in Auto, and it never affects Generate's price. Auto's resolved method/class determines the price, so quote the possible range until routing resolves. Preserve explicit requirements; working articulation needs Build (`procedural`). Planning/editing/reference operations currently do not reserve prototype credits.
+Every Build runs on the Blender builder; omit `geometry_builder`. The older values `codex` and `responses` are still accepted but also build with Blender, so they do not change the engine or the price. Auto's resolved method/class determines the price, so quote the possible range until routing resolves. Preserve explicit requirements; working articulation needs Build (`procedural`). Planning/editing/reference operations currently do not reserve prototype credits.
 
-Prototype price by request, using the documented illustrative prices (Generate 5, Responses Build 5, Codex Build 20 rigid / 40 articulated). Recompute from live `data.pricing` before quoting:
+Prototype price by request, using the documented illustrative prices (Generate 5, Build 20 rigid / 40 articulated). Recompute from live `data.pricing` before quoting:
 
-| `asset_class` + `generation_method` | `codex` (default) | `responses` |
-| --- | --- | --- |
-| rigid + auto | Generate 5 **or** Build 20 | 5 either way |
-| rigid + generative | 5 | 5 |
-| rigid + procedural | 20 | 5 |
-| articulated + auto/procedural | 40 | 5 |
-| auto + auto | 5, 20 or 40 | 5 |
+| `asset_class` + `generation_method` | Price |
+| --- | --- |
+| rigid + auto | Generate 5 **or** Build 20 |
+| rigid + generative | 5 |
+| rigid + procedural | 20 |
+| articulated + auto/procedural | 40 |
+| auto + auto | 5, 20 or 40 |
 
 With `auto_submit=true`, add `authored_to_simready` for the conversion. Budget the upper bound of a range.
 
-**Choosing a builder.** `codex` ("High quality") runs an isolated agent that checks the physical/joint contract, visually reviews closed and articulated poses, and exports the GLB itself. It costs 4–8× more and can take up to ~30 minutes. `responses` ("Standard") is a single model build with no visual review loop, and its builds time out at ~20 minutes. Recommend Codex when appearance or working articulation matters (hero objects, mechanisms the robot must operate). Recommend Responses for cheap placeholders, background props or fast iteration, where a weaker first attempt can be revised. No measured quality comparison is published, so do not quote one.
+**Build engine.** There is no builder choice. Every Build runs an isolated Blender agent that checks the physical/joint contract, reviews closed and articulated renders, and exports the GLB, manifest and captures itself; allow up to ~30 minutes. If a caller asks for "Standard", "High quality", Codex or Responses, explain that Build now always uses Blender at the Build price. Compositions built earlier with Three.js report `geometry_builder` `codex` or `responses`; that is history, not an option.
 
 **Where charges appear.** Generate: `data.rigid_prototype.credits_charged` on the composition. Build: the composition does not report its charge, so report the priced key as the expected charge and say it is unconfirmed. Conversion: `credits_charged` on the `202` job and on `GET /conversions/:id`. Simulation: the charged amount on its `202`. Failed attempts refund automatically, but refund state is not exposed. To confirm the actual spend, read `GET /me` → `data.subscription.credits_remaining` (API keys accepted) before and after. Concurrent jobs make that difference approximate. Per-transaction history is browser-only at [app.rigyd.com/billing](https://app.rigyd.com/billing). An absent amount is unknown, not zero. Use [pricing documentation](https://docs.rigyd.com/jobs/pricing.md) for current billing semantics.
 

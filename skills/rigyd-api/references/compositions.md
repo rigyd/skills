@@ -12,7 +12,7 @@ Required `prompt` and `robot_task`: nonempty strings, each at most 2000 characte
 | --- | --- |
 | `asset_class` | `auto` (default), `rigid`, `articulated` |
 | `generation_method` | `auto` (default), `procedural` (Build), `generative` (Tripo Generate) |
-| `geometry_builder` | `codex` (default) or `responses`; applies to Build |
+| `geometry_builder` | Omit. Build always uses `blender` (default); `codex` and `responses` are accepted but also build with Blender |
 | `auto_submit` | Boolean, default false; true includes subsequent conversion |
 | `negative_prompt` | At most 255 characters |
 | `physical_context` | Object: positive `mass_kg`; `dimensions_m` with positive `length`, `width`, `height` (subset allowed); `materials` string array; `fixed_base` boolean |

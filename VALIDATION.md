@@ -68,6 +68,10 @@ An agent that used the skill to provision a multi-asset MuJoCo scene reported 14
 
 Offline with-skill vs previous-skill evaluation in Claude Code (three cases: scene pricing, status script, MJCF scene merge): **17/17** assertions for the revision vs **13/17** for the previous skill. The previous skill missed the Codex trade-off, the charge fields/balance check and the non-interactive shell note, and quoted `201`. The existing behavior, atomic and public-content checks above still pass. Exporter changes that remove these MJCF merge issues at the source are tracked separately in Physiq.
 
+## Blender builder default (10 November 2026)
+
+The API now runs every Build on the Blender builder; `codex` and `responses` are accepted but also build with Blender. The skill drops the builder choice and the Standard price row, prices Build with the `_codex` keys, tells agents to omit `geometry_builder`, and skips scaffold/export/upload for Blender builds, which arrive with their artifacts. The `generate` behavior case no longer asks for Responses, and the generate and revise checks accept only an omitted or `blender` builder. The model evaluations above were not re-run for this change.
+
 ## Limits and release gates
 
 These checks establish instruction routing, request-plan behavior and the tested multipart integration. They do not establish live generation quality, production availability, actual geometry export, simulator import or multi-asset scene correctness. Browser export needs the pinned rendering ground and Three.js runtime; durable exactly-once paid submission remains an API limitation.

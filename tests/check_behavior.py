@@ -23,7 +23,7 @@ def one(name, method, suffix):
 
 body = one("generate", "POST", "/compositions/generate")
 assert body["generation_method"] == "procedural"
-assert body["geometry_builder"] == "responses" and body["asset_class"] == "articulated"
+assert body.get("geometry_builder") in (None, "blender") and body["asset_class"] == "articulated"
 assert body.get("auto_submit", False) in (False, "false"), "Multipart accepts a serialized boolean"
 assert body["negative_prompt"] == "extra handles"
 assert [file["file"] for file in body["images"]] == ["front.png", "right.png", "back.png", "left.png"]

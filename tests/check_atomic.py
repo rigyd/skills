@@ -40,7 +40,7 @@ assert bodies["answer"]["answers"] == [{"question_id":"q1","values":["medium"],"
 assert bodies["message"] == {"message":"make the shade wider"}
 assert list(map(str, bodies["select"]["media_ids"])) == ["3", "2"]
 assert bodies["revise"]["feedback"] == "increase hinge clearance"
-assert bodies["revise"].get("geometry_builder", "responses") == "responses"
+assert bodies["revise"].get("geometry_builder") in (None, "blender"), "Revisions run on Blender; no Three.js builder is sent"
 assert queries["scaffold"]["ground_version"] == ["rigyd-three-r183-alpha-12"]
 assert bodies["convert_ready"]["asset_license"] == "CC0-1.0" and "job-converted" in cases["convert_ready"]["result"]
 body = bodies["file_conversion"]
