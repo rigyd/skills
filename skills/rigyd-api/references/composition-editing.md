@@ -18,7 +18,7 @@ The automatic 0/1/4 image-count rule does not apply to interactive start, which 
 
 `draft_prompt` ≤1024 characters (different from the 2000-character seed), `negative_prompt` ≤255, `generation_method=auto|procedural|generative`, `tripo_params`, `asset_brief`.
 
-Tripo accepts `model_version` (`v3.1-20260211`, `v3.0-20250812`, `v2.5-20250123` at review), `pbr` boolean, `geometry_quality=standard|detailed`, `smart_low_poly` boolean. `face_limit` and `texture_quality` are platform-fixed; submitting custom values does not make them user controls.
+Tripo accepts `model_version` (`v3.1-20260211`, `v3.0-20250812`), `pbr` boolean, `geometry_quality=standard|detailed`, `smart_low_poly` boolean. Legacy `v2.5-20250123` selections are translated to `v3.1-20260211` when editing parameters or starting a new prototype, including saved drafts; completed prototypes remain available for conversion. `face_limit` and `texture_quality` are platform-fixed; submitting custom values does not make them user controls. From December 1, 2026, enabled smart low-poly generation automatically uses retopology V3.0 and topology can change.
 
 `asset_brief` is normalized as a replacement object, not a deep partial patch. Read the current brief and merge the requested edits before sending it, preserving other supported fields. Supported content includes classification, `generation_plan`, confidence/reasoning, articulation hints, declared physics, image `proportion_contract` and `context_conflicts`; consult the linked schema for all fields and limits. Prompt fields derive from the effective composition draft/negative prompt, so edit those at top level.
 
