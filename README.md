@@ -24,7 +24,7 @@ Example: “Use rigyd-api to inspect conversion job `<id>` and report its status
 
 ## Package boundaries
 
-The skill exposes 25 customer HTTP bindings through seven focused references. It does not install an SDK, start an MCP server, change account/billing settings or assemble a scene implicitly. Orchestrators retain their own state, budget, placements and simulator tests. Public documentation remains the authoritative parameter contract.
+The skill exposes 31 customer HTTP bindings through eight focused references. It does not install an SDK, start an MCP server, change account/billing settings or assemble a scene implicitly. Orchestrators retain their own state, budget, placements and simulator tests. Public documentation remains the authoritative parameter contract.
 
 Published under the [MIT license](LICENSE). Validation evidence lives in [VALIDATION.md](VALIDATION.md), outside the loaded skill.
 

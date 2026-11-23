@@ -1,6 +1,6 @@
 ---
 name: rigyd-api
-description: Create, edit, convert, inspect, download and simulate physics-enabled assets with the Rigyd API. Use for Rigyd asset workflows and asset provisioning by simulation orchestrators.
+description: Create, edit, convert, inspect, download and simulate physics-enabled assets with the Rigyd API, and research and build collections of real products. Use for Rigyd asset workflows and asset provisioning by simulation orchestrators.
 ---
 
 # Rigyd API
@@ -19,6 +19,7 @@ Read only the relevant reference. Operation labels below are instruction vocabul
 | Convert an existing file; list/get conversion or simulation jobs | [conversions](references/conversions.md) |
 | Download USD/MJCF; interpret reports; combine MJCF files into a scene; start an asset simulation | [results](references/results.md) |
 | Share an asset; read shared assets or the public gallery | [catalog](references/catalog.md) |
+| Research a set of real products, review the shortlist, approve and build it | [collections](references/collections.md) |
 | Provision multiple assets, resume work, hand off to a scene orchestrator | [orchestration](references/orchestration.md) |
 
 ## Execute within scope
@@ -60,6 +61,7 @@ Before a paid stage, read `GET /conversions/pricing` → `data.pricing`. Zero is
 | Uploaded file conversion | `glb_to_simready` |
 | Ready prototype conversion | `authored_to_simready` |
 | Individual asset simulation | `simulate_usd` |
+| Collection research, per researched product | `collection_research` |
 
 Every Build runs on the Blender builder; omit `geometry_builder`. The older values `codex` and `responses` are still accepted but also build with Blender, so they do not change the engine or the price. Auto's resolved method/class determines the price, so quote the possible range until routing resolves. Preserve explicit requirements; working articulation needs Build (`procedural`). Planning/editing/reference operations currently do not reserve prototype credits.
 
